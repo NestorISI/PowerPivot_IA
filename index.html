@@ -1,9 +1,13 @@
 <!--
   Power Pivot + IA — Guía interactiva
-  Versión actual: 1.4 (27 ago 2026)
+  Versión actual: 1.5 (27 ago 2026)
 
   REGISTRO DE VERSIONES
   ---------------------
+  v1.5 — 27 ago 2026
+    · M1.H1: el prompt 3 (código M) pide revisar la sintaxis antes de
+      entregar el código, para evitar errores tipo Expression.SyntaxError.
+
   v1.4 — 27 ago 2026
     · M1.H1: Paso 1 pasa de generar 2 a 4 tablas (se agregan Productos y
       Vendedores) para sostener los ejercicios de módulos posteriores que ya
@@ -571,7 +575,7 @@
             { label: "Paso 1 · Generar las tablas", text: "Estoy empezando un curso de Power Pivot en Excel y necesito datos de práctica que después voy a importar con Power Query. Generame cuatro tablas de ejemplo de una empresa que vende productos, con relaciones consistentes entre ellas. VENTAS: 60 filas, con las columnas ID Venta, Fecha, ID Cliente, ID Vendedor, ID Producto, Cantidad y Precio Unitario. CLIENTES: 12 filas, con las columnas ID Cliente, Nombre, Apellido, Ciudad, Fecha de Alta, Fecha de Nacimiento, Género y Estado Civil. PRODUCTOS: 10 filas, con las columnas ID Producto, Nombre de Producto, Marca y Costo. VENDEDORES: 5 filas, con las columnas ID Vendedor, Nombre, País, Continente y Sucursal. Todos los ID Cliente, ID Vendedor e ID Producto que aparezcan en Ventas tienen que existir en sus tablas correspondientes, y las fechas de Ventas tienen que estar entre enero de 2023 y diciembre de 2024. Escribí todo en español." },
             { label: "Paso 2 · Ensuciar los datos", text: "Ahora ensuciá los datos de esas cuatro tablas a propósito para que tenga algo que limpiar después: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas." },
             { type: "instructivo", label: "Paso Manual · Guardar el archivo", text: "Guarda el archivo con las cuatro hojas con datos \"sucios\" y ponle el nombre de 'datos_a_limpiar.xlsx'. Si tu IA no puede generar el archivo directamente, guardalo vos con ese nombre. Anotá la ruta completa de la carpeta donde quedó guardado: la vas a necesitar en el próximo paso." },
-            { label: "Paso 4 · Código M de limpieza", text: "Generá el código M completo, en cuatro bloques separados (uno por tabla), listos para pegar cada uno en una consulta en blanco del Editor avanzado de Power Query. Cada bloque tiene que cargar el archivo datos_a_limpiar.xlsx y aplicar automáticamente la corrección de tipos de dato y todos los pasos de limpieza necesarios sobre su tabla (Ventas, Clientes, Productos y Vendedores), dejándolas listas antes de cargarlas al modelo de datos. En el paso Origen de cada bloque, usá File.Contents(\"RUTA_DEL_ARCHIVO\\datos_a_limpiar.xlsx\") como marcador de ruta, que yo voy a reemplazar por la ubicación real del archivo en mi computadora.\nColoca los pasos de las consultas con nombres descriptivos en español (por ejemplo \"Tipo cambiado\", \"Espacios recortados\") para que me sea fácil identificarlos y seguirlos en el administrador de pasos de Power Query. Nombrá los menús de Excel en español." }
+            { label: "Paso 4 · Código M de limpieza", text: "Generá el código M completo, en cuatro bloques separados (uno por tabla), listos para pegar cada uno en una consulta en blanco del Editor avanzado de Power Query. Cada bloque tiene que cargar el archivo datos_a_limpiar.xlsx y aplicar automáticamente la corrección de tipos de dato y todos los pasos de limpieza necesarios sobre su tabla (Ventas, Clientes, Productos y Vendedores), dejándolas listas antes de cargarlas al modelo de datos. En el paso Origen de cada bloque, usá File.Contents(\"RUTA_DEL_ARCHIVO\\datos_a_limpiar.xlsx\") como marcador de ruta, que yo voy a reemplazar por la ubicación real del archivo en mi computadora.\nColoca los pasos de las consultas con nombres descriptivos en español (por ejemplo \"Tipo cambiado\", \"Espacios recortados\") para que me sea fácil identificarlos y seguirlos en el administrador de pasos de Power Query. Nombrá los menús de Excel en español.\nRevisá que la sintaxis M sea válida (comas, comillas y paréntesis bien cerrados) antes de entregarlo, para que no tire errores como Expression.SyntaxError al pegarlo en el Editor avanzado." }
           ],
           ejercicio: [
             "En un libro de Excel en blanco nuevo (el libro del curso): Datos → Obtener datos → Consulta en blanco, cuatro veces (una por tabla).",
