@@ -10,6 +10,11 @@
       mostrarlo con un clic. Se cierra solo al cambiar de hoja.
 
   v1.5 — 27 ago 2026
+    · M1.H2: hoja reescrita para continuar en el mismo archivo de M1.H1
+      (las 4 tablas ya limpias en el modelo). Prompt 1 diseña las relaciones,
+      paso manual para crearlas en la Vista de diagrama, prompt 2 valida con
+      una dinámica. Se agrega un bloque nuevo tipo "tip" (plegable, cerrado
+      por defecto) con los rechazos típicos de relación en datos propios.
     · M1.H1: el prompt 3 (código M) pide revisar la sintaxis antes de
       entregar el código, para evitar errores tipo Expression.SyntaxError.
 
@@ -377,6 +382,34 @@
     background: var(--green-soft);
   }
   .callout.instructivo .block-label{ color: var(--green-ink); }
+  details.callout.tip{
+    border-color: color-mix(in srgb, var(--line) 100%, transparent);
+    border-style: dashed;
+    background: var(--surface);
+    box-shadow: none;
+    padding: 12px 16px;
+  }
+  details.callout.tip > summary{ cursor: pointer; list-style: none; margin: 0; user-select: none; }
+  details.callout.tip > summary::-webkit-details-marker{ display:none; }
+  details.callout.tip > summary::after{
+    content: "\25B8";
+    margin-left: auto;
+    font-size: 13px;
+    transition: transform .15s ease;
+  }
+  details.callout.tip[open] > summary::after{ transform: rotate(90deg); }
+  details.callout.tip[open] > summary{ margin-bottom: 12px; }
+  details.callout.tip .toggle-hint{ text-transform: none; letter-spacing: 0; font-size: 11px; opacity: .7; }
+  details.callout.tip[open] .toggle-hint{ display:none; }
+  details.callout.tip p{
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0 0 10px;
+    max-width: 66ch;
+  }
+  details.callout.tip p:last-child{ margin-bottom: 0; }
   .callout.instructivo .instructivo-text{
     font-family: var(--font-body);
     font-size: 14.5px;
@@ -616,14 +649,26 @@
           id: "h2", title: "Relacionar las tablas (modelo de datos)",
           sub: "Sin relaciones, Power Pivot no puede cruzar la información entre tablas.",
           concepto: [
-            "Una relación conecta una tabla de hechos (por ejemplo Ventas) con tablas de dimensiones (Clientes, Productos, Vendedores) a través de un campo en común.",
-            "Esto se define en la Vista de diagrama de Power Pivot, arrastrando de la clave de una tabla a la otra."
+            "Una relación conecta la tabla de hechos (Ventas, donde se registra cada transacción) con las tablas de dimensiones (Clientes, Productos y Vendedores, que describen a los protagonistas de esas transacciones) a través de un campo en común.",
+            "Se define en la Vista de diagrama de Power Pivot, arrastrando la clave de una tabla hasta la de la otra. Del lado de la dimensión esa clave no puede repetirse: es la que identifica de forma única a cada cliente, producto o vendedor.",
+            "Seguimos en el mismo archivo de la hoja anterior: las cuatro tablas ya están limpias y cargadas al modelo de datos, así que acá solo falta conectarlas. Power Pivot no crea las relaciones solo — este es uno de los pasos que vas a hacer vos, porque la IA integrada de Excel no puede manejar la Vista de diagrama."
           ],
-          prompt: "Tengo una tabla de HECHOS llamada Ventas con las columnas [...] y tablas de DIMENSIONES: Clientes, Productos, Vendedores con columnas [...]. ¿Qué relaciones debería crear y por qué campo? Explicame la diferencia entre tabla de hechos y de dimensiones con este ejemplo.",
+          prompt: [
+            { label: "Paso 1 · Diseñar el modelo", text: "En Excel ya tengo cargadas al modelo de datos de Power Pivot cuatro tablas limpias: Ventas (ID Venta, Fecha, ID Cliente, ID Vendedor, ID Producto, Cantidad, Precio Unitario), Clientes (ID Cliente, Nombre, Apellido, Ciudad, Fecha de Alta, Fecha de Nacimiento, Género, Estado Civil), Productos (ID Producto, Nombre de Producto, Marca, Costo) y Vendedores (ID Vendedor, Nombre, País, Continente, Sucursal). Decime cuál es la tabla de hechos y cuáles son las de dimensiones, y armame la lista de relaciones que tengo que crear en la Vista de diagrama. Para cada relación indicá: tabla y campo de origen, tabla y campo de destino, cardinalidad y dirección del filtro. Respondé en español, en formato de tabla, y nombrá los menús de Excel en español." },
+            { type: "instructivo", label: "Paso Manual · Crear las relaciones", text: "En el menú Power Pivot → Administrar → Vista de diagrama. Arrastrá cada campo clave de Ventas hasta el campo del mismo nombre en su tabla de dimensión, siguiendo la lista que te dio la IA. Si no ves la pestaña Power Pivot: Archivo → Opciones → Complementos → Administrar: Complementos COM → Ir → tildar Microsoft Power Pivot para Excel." },
+            { label: "Paso 2 · Validar el modelo", text: "Ya creé las relaciones en Power Pivot. Decime el paso a paso, con los menús de Excel en español, para insertar una tabla dinámica basada en el modelo de datos que muestre la suma de Cantidad, con Marca (de la tabla Productos) en las filas y País (de la tabla Vendedores) en las columnas. Explicame también cómo darme cuenta, mirando el resultado de esa tabla dinámica, si alguna relación quedó mal creada o falta crear." },
+            { type: "tip", label: "Tip · Si Excel rechaza una relación", text: [
+              "Con estos datos de práctica las relaciones deberían crearse sin problemas, porque la limpieza de la hoja anterior ya dejó los tipos de dato correctos y los ID consistentes. Pero cuando trabajes con datos propios te vas a topar con estos tres rechazos:",
+              "1. Claves duplicadas: el campo del lado de la dimensión se repite (dos veces el mismo ID Cliente). Hay que quitar los duplicados en Power Query antes de relacionar.",
+              "2. IDs huérfanos: aparecen valores en Ventas que no existen en la dimensión. La relación se crea igual, pero esas ventas quedan agrupadas en una fila en blanco de la dinámica.",
+              "3. Tipos de dato distintos: un ID quedó como texto en una tabla y como número en la otra. Se corrige en Power Query cambiando el tipo y actualizando."
+            ] }
+          ],
           ejercicio: [
-            "Abrir la Vista de diagrama en Power Pivot (Inicio → Vista de diagrama).",
-            "Conectar cada tabla de dimensión con la tabla de hechos por su campo clave.",
-            "Verificar con una tabla dinámica simple que los datos ya se cruzan correctamente."
+            "Abrir Power Pivot → Administrar → Vista de diagrama y ubicar las cuatro tablas.",
+            "Crear las tres relaciones que indicó la IA, arrastrando desde Ventas hacia cada tabla de dimensión.",
+            "Revisar cada línea del diagrama: el 1 tiene que quedar del lado de la dimensión, el asterisco del lado de Ventas y la flecha apuntando hacia Ventas.",
+            "Insertar la tabla dinámica de validación y comprobar que los números cambian según la Marca y el País — si todas las celdas repiten el mismo total, hay una relación que falta o quedó mal."
           ]
         },
         {
@@ -1052,10 +1097,17 @@
     conceptoEl.innerHTML = h.concepto.map(function(p){ return "<p>" + esc(p) + "</p>"; }).join("");
 
     var prompts = Array.isArray(h.prompt) ? h.prompt : [{ label: null, text: h.prompt }];
-    var promptItems = prompts.filter(function(p){ return p.type !== "instructivo"; });
+    var promptItems = prompts.filter(function(p){ return p.type !== "instructivo" && p.type !== "tip"; });
     var multi = promptItems.length > 1;
     var promptCounter = 0;
     document.getElementById("hoja-prompts").innerHTML = prompts.map(function(p, i){
+      if (p.type === "tip") {
+        var tipBody = (Array.isArray(p.text) ? p.text : [p.text]).map(function(t){ return "<p>" + esc(t) + "</p>"; }).join("");
+        return '<details class="callout tip" style="' + (i > 0 ? "margin-top:14px;" : "") + '">' +
+          '<summary class="block-label"><span class="dot"></span>' + esc(p.label || "Tip") + '<span class="toggle-hint">clic para mostrar</span></summary>' +
+          tipBody +
+          '</details>';
+      }
       if (p.type === "instructivo") {
         return '<div class="callout instructivo" style="' + (i > 0 ? "margin-top:14px;" : "") + '">' +
           '<p class="block-label"><span class="dot"></span>' + esc(p.label || "Paso a seguir") + '</p>' +
