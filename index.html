@@ -1,9 +1,14 @@
 <!--
   Power Pivot + IA — Guía interactiva
-  Versión actual: 1.5 (27 ago 2026)
+  Versión actual: 1.6 (27 ago 2026)
 
   REGISTRO DE VERSIONES
   ---------------------
+  v1.6 — 27 ago 2026
+    · El bloque Concepto pasa a ser un desplegable "Conceptos y tips", cerrado
+      por defecto en todas las hojas, para que el profesor decida cuándo
+      mostrarlo con un clic. Se cierra solo al cambiar de hoja.
+
   v1.5 — 27 ago 2026
     · M1.H1: el prompt 3 (código M) pide revisar la sintaxis antes de
       entregar el código, para evitar errores tipo Expression.SyntaxError.
@@ -331,6 +336,30 @@
   .concepto p{ margin: 0 0 12px; max-width: 66ch; color: var(--ink); }
   .concepto p:last-child{ margin-bottom:0; }
 
+  details.concepto{ border: 1px dashed var(--line); border-radius: var(--radius); padding: 12px 16px; background: var(--surface); }
+  details.concepto > summary{
+    cursor: pointer;
+    list-style: none;
+    margin: 0;
+    user-select: none;
+  }
+  details.concepto > summary::-webkit-details-marker{ display:none; }
+  details.concepto > summary::after{
+    content: "\25B8";
+    margin-left: auto;
+    font-size: 13px;
+    transition: transform .15s ease;
+  }
+  details.concepto[open] > summary::after{ transform: rotate(90deg); }
+  details.concepto[open] > summary{ margin-bottom: 14px; }
+  details.concepto .toggle-hint{
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+    opacity: .7;
+  }
+  details.concepto[open] .toggle-hint{ display:none; }
+
   .callout{
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -519,7 +548,7 @@
         <button data-theme-choice="system" id="btn-system">Auto</button>
       </div>
       <button class="reset-btn" id="reset-progress">Reiniciar progreso</button>
-      <div class="version">v1.4 &middot; 27 ago 2026</div>
+      <div class="version">v1.6 &middot; 27 ago 2026</div>
     </div>
   </aside>
 
@@ -530,10 +559,10 @@
       <h2 class="hoja-title" id="hoja-title"></h2>
       <p class="hoja-sub" id="hoja-sub"></p>
 
-      <section class="block concepto">
-        <p class="block-label"><span class="dot"></span>Concepto</p>
+      <details class="block concepto" id="hoja-concepto-wrap">
+        <summary class="block-label"><span class="dot"></span>Conceptos y tips<span class="toggle-hint">clic para mostrar</span></summary>
         <div id="hoja-concepto"></div>
-      </section>
+      </details>
 
       <section class="block" id="hoja-prompts"></section>
 
@@ -1017,6 +1046,8 @@
     document.getElementById("hoja-title").textContent = h.title;
     document.getElementById("hoja-sub").textContent = h.sub;
 
+    var conceptoWrap = document.getElementById("hoja-concepto-wrap");
+    if (conceptoWrap) conceptoWrap.open = false;
     var conceptoEl = document.getElementById("hoja-concepto");
     conceptoEl.innerHTML = h.concepto.map(function(p){ return "<p>" + esc(p) + "</p>"; }).join("");
 
