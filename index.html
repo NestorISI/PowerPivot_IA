@@ -1,9 +1,16 @@
 <!--
   Power Pivot + IA — Guía interactiva
-  Versión actual: 1.8 (27 ago 2026)
+  Versión actual: 1.9 (27 ago 2026)
 
   REGISTRO DE VERSIONES
   ---------------------
+  v1.9 — 27 ago 2026
+    · Se ocultan (NO se eliminan) los módulos 2, 3, 4 y 5. El contenido sigue
+      completo dentro del array DATA; solo se filtra en la vista mediante la
+      constante MODULOS_OCULTOS, definida justo antes de DATA.
+      PARA RESTAURAR TODO COMO ANTES: dejar el array vacío ->
+      var MODULOS_OCULTOS = [];
+
   v1.8 — 27 ago 2026
     · M1.H3: hoja reescrita para continuar en el mismo archivo de M1.H2. La
       tabla de calendario se genera con el botón nativo de Power Pivot
@@ -629,7 +636,7 @@
         <button data-theme-choice="system" id="btn-system">Auto</button>
       </div>
       <button class="reset-btn" id="reset-progress">Reiniciar progreso</button>
-      <div class="version">v1.8 &middot; 27 ago 2026</div>
+      <div class="version">v1.9 &middot; 27 ago 2026</div>
     </div>
   </aside>
 
@@ -672,6 +679,18 @@
 <script>
 (function(){
   "use strict";
+
+  /* ==========================================================================
+     MÓDULOS OCULTOS
+     --------------------------------------------------------------------------
+     Los módulos listados acá NO fueron eliminados: su contenido sigue completo
+     más abajo, dentro del array DATA. Solo se filtran de la vista (índice
+     lateral, portada y paginador).
+
+     PARA VOLVER A MOSTRARLOS Y DEJAR TODO COMO ANTES DE ESTE CAMBIO:
+         var MODULOS_OCULTOS = [];
+     ========================================================================== */
+  var MODULOS_OCULTOS = ["m2", "m3", "m4", "m5"];
 
   var DATA = [
     {
@@ -1016,6 +1035,9 @@
       ]
     }
   ];
+
+  /* Filtro de módulos ocultos (ver MODULOS_OCULTOS arriba). */
+  DATA = DATA.filter(function(m){ return MODULOS_OCULTOS.indexOf(m.id) === -1; });
 
   var FLAT = [];
   DATA.forEach(function(m, mi){
