@@ -4,6 +4,13 @@
 
   REGISTRO DE VERSIONES
   ---------------------
+  v1.3 — 27 ago 2026
+    · M1.H1: se agrega un paso instructivo (no prompt, sin botón de copiar)
+      entre el prompt que ensucia los datos y el que genera el código M: el
+      alumno guarda el archivo como datos_a_limpiar.xlsx. El prompt de
+      limpieza ahora toma ese archivo como origen explícito. Ejercicio
+      reescrito a 3 pasos acorde a este flujo.
+
   v1.2 — 27 ago 2026
     · M1.H1: la limpieza de datos ahora también la hace la IA. El prompt pide
       código M (Editor avanzado de Power Query) en vez de una lista de pasos
@@ -319,6 +326,18 @@
     background: var(--amber-soft);
   }
   .callout.ia .block-label{ color: var(--amber-ink); }
+  .callout.instructivo{
+    border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+    background: var(--green-soft);
+  }
+  .callout.instructivo .block-label{ color: var(--green-ink); }
+  .callout.instructivo .instructivo-text{
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0;
+  }
   .callout .prompt-text{
     font-family: var(--font-mono);
     font-size: 13.5px;
@@ -537,14 +556,13 @@
           ],
           prompt: [
             { label: "Paso 1 · Generar las tablas", text: "Estoy empezando un curso de Power Pivot en Excel y necesito datos de práctica que después voy a importar con Power Query. Generame dos tablas de ejemplo de una empresa que vende productos. VENTAS: 60 filas, con las columnas ID Venta, Fecha, ID Cliente, Producto, Cantidad y Precio Unitario. CLIENTES: 12 filas, con las columnas ID Cliente, Nombre, Apellido, Ciudad y Fecha de Alta. Todos los ID Cliente que aparezcan en Ventas tienen que existir en Clientes, y las fechas tienen que estar entre enero de 2023 y diciembre de 2024. Escribí todo en español." },
-            { label: "Paso 2 · Ensuciar los datos", text: "Ahora ensuciá los datos de esas dos tablas a propósito para que tenga algo que limpiar después: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas." },
-            { label: "Paso 3 · Formato para copiar a Excel", text: "Mostrame cada una de las dos tablas, ya con los datos sucios, en un bloque de código separado, con las columnas separadas por tabulaciones, para poder copiarlas y pegarlas en Excel y que se repartan solas en columnas." },
-            { label: "Paso 4 · Código M de limpieza", text: "Generá el código M completo, listo para pegar en el Editor avanzado de Power Query, que aplique automáticamente la corrección de tipos de dato y todos los pasos de limpieza necesarios sobre cada una de las dos tablas (Ventas y Clientes), antes de cargarlas al modelo de datos. Nombrá los menús de Excel en español." }
+            { label: "Paso 2 · Ensuciar los datos", text: "Ahora ensuciá los datos de esas dos tablas a propósito para que tenga algo que limpiar después: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas. Mostrame cada una de las dos tablas, ya con los datos sucios, en un bloque de código separado, con las columnas separadas por tabulaciones, para poder copiarlas y pegarlas en Excel y que se repartan solas en columnas." },
+            { type: "instructivo", label: "Paso 3 · Guardar el archivo", text: "Guarda el archivo con las dos hojas con datos \"sucios\" y ponle el nombre de 'datos_a_limpiar.xlsx'. Si al pegar cae todo en la columna A, usá Datos → Texto en columnas y elegí Tabulación como separador." },
+            { label: "Paso 4 · Código M de limpieza", text: "Generá el código M completo, listo para pegar en el Editor avanzado de Power Query, que tome como origen el archivo datos_a_limpiar.xlsx y aplique automáticamente la corrección de tipos de dato y todos los pasos de limpieza necesarios sobre cada una de las dos tablas (Ventas y Clientes), dejándolas listas y limpias antes de cargarlas al modelo de datos. Nombrá los menús de Excel en español." }
           ],
           ejercicio: [
-            "Pegar las dos tablas que generó la IA en un libro nuevo (una en cada hoja) y guardarlo como Origen de datos.xlsx. Si al pegar cae todo en la columna A, usá Datos → Texto en columnas y elegí Tabulación como separador.",
-            "Desde el libro del curso: Datos → Obtener datos → Desde un archivo → Desde un libro, seleccionar las dos tablas y presionar Transformar datos.",
-            "En Power Query, abrir el Editor avanzado de cada consulta (Inicio → Editor avanzado), pegar el código M que generó la IA y aplicar los cambios.",
+            "En un libro de Excel en blanco nuevo (el libro del curso): Datos → Obtener datos → Desde un archivo → Desde un libro, seleccionar datos_a_limpiar.xlsx, elegir las dos tablas y presionar Transformar datos.",
+            "En Power Query, abrir el Editor avanzado de cada consulta (Inicio → Editor avanzado), pegar el código M que generó la IA y aplicar los cambios. Las dos tablas van a quedar limpias.",
             "Cerrar y cargar en → Solo crear conexión, tildando Agregar estos datos al modelo de datos."
           ]
         },
@@ -986,10 +1004,19 @@
     conceptoEl.innerHTML = h.concepto.map(function(p){ return "<p>" + esc(p) + "</p>"; }).join("");
 
     var prompts = Array.isArray(h.prompt) ? h.prompt : [{ label: null, text: h.prompt }];
-    var multi = prompts.length > 1;
+    var promptItems = prompts.filter(function(p){ return p.type !== "instructivo"; });
+    var multi = promptItems.length > 1;
+    var promptCounter = 0;
     document.getElementById("hoja-prompts").innerHTML = prompts.map(function(p, i){
+      if (p.type === "instructivo") {
+        return '<div class="callout instructivo" style="' + (i > 0 ? "margin-top:14px;" : "") + '">' +
+          '<p class="block-label"><span class="dot"></span>' + esc(p.label || "Paso a seguir") + '</p>' +
+          '<p class="instructivo-text">' + esc(p.text) + '</p>' +
+          '</div>';
+      }
+      promptCounter++;
       var labelText = multi
-        ? "Prompt " + (i + 1) + " de " + prompts.length + (p.label ? " · " + esc(p.label.replace(/^Paso \d+ · /, "")) : "")
+        ? "Prompt " + promptCounter + " de " + promptItems.length + (p.label ? " · " + esc(p.label.replace(/^Paso \d+ · /, "")) : "")
         : "Prompt para la IA";
       return '<div class="callout ia" style="' + (i > 0 ? "margin-top:14px;" : "") + '">' +
         '<p class="block-label"><span class="dot"></span>' + labelText + '</p>' +
