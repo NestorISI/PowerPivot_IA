@@ -1,9 +1,14 @@
 <!--
   Power Pivot + IA — Guía interactiva
-  Versión actual: 1.1 (27 ago 2026)
+  Versión actual: 1.2 (27 ago 2026)
 
   REGISTRO DE VERSIONES
   ---------------------
+  v1.2 — 27 ago 2026
+    · M1.H1: la limpieza de datos ahora también la hace la IA. El prompt pide
+      código M (Editor avanzado de Power Query) en vez de una lista de pasos
+      manuales; el ejercicio pasa a pegar ese código en lugar de limpiar a mano.
+
   v1.1 — 27 ago 2026
     · M1.H1: prompt reescrito para que sea autosuficiente (el alumno lo copia y
       lo pega sin completar nada). Ahora la IA genera las tablas de práctica.
@@ -536,11 +541,11 @@
             "Ahí se define el tipo de cada columna (texto, fecha, número, moneda) antes de mandarla al modelo de datos — corregir esto al principio evita errores más adelante en las fórmulas DAX.",
             "Como arrancamos con un libro en blanco, el archivo de origen lo vas a fabricar vos: el prompt de esta hoja le pide a la IA que genere dos tablas de práctica, ya ensuciadas a propósito, para que tengas algo real que importar y limpiar."
           ],
-          prompt: "Estoy empezando un curso de Power Pivot en Excel y necesito datos de práctica que después voy a importar con Power Query.\n\n1. Generame dos tablas de ejemplo de una empresa que vende productos. VENTAS: 60 filas, con las columnas ID Venta, Fecha, ID Cliente, Producto, Cantidad y Precio Unitario. CLIENTES: 12 filas, con las columnas ID Cliente, Nombre, Apellido, Ciudad y Fecha de Alta. Todos los ID Cliente que aparezcan en Ventas tienen que existir en Clientes, y las fechas tienen que estar entre enero de 2023 y diciembre de 2024.\n\n2. Ensuciá los datos a propósito para que tenga algo que limpiar: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas.\n\n3. Mostrame cada tabla en un bloque de código, con las columnas separadas por tabulaciones, para poder copiarlas y pegarlas en Excel y que se repartan solas en columnas.\n\n4. Después de las tablas, hacé una lista con el tipo de dato que le corresponde a cada columna en Power Query (texto, fecha, número entero, decimal, moneda) y con los pasos de limpieza que tengo que aplicar, en orden, antes de cargar las tablas al modelo de datos.\n\nEscribí todo en español y nombrá los menús de Excel en español.",
+          prompt: "Estoy empezando un curso de Power Pivot en Excel y necesito datos de práctica que después voy a importar con Power Query.\n\n1. Generame dos tablas de ejemplo de una empresa que vende productos. VENTAS: 60 filas, con las columnas ID Venta, Fecha, ID Cliente, Producto, Cantidad y Precio Unitario. CLIENTES: 12 filas, con las columnas ID Cliente, Nombre, Apellido, Ciudad y Fecha de Alta. Todos los ID Cliente que aparezcan en Ventas tienen que existir en Clientes, y las fechas tienen que estar entre enero de 2023 y diciembre de 2024.\n\n2. Ensuciá los datos a propósito para que tenga algo que limpiar: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas.\n\n3. Mostrame cada tabla en un bloque de código, con las columnas separadas por tabulaciones, para poder copiarlas y pegarlas en Excel y que se repartan solas en columnas.\n\n4. Después de las tablas, generá el código M completo (listo para pegar en el Editor avanzado de Power Query) que aplique automáticamente la corrección de tipos de dato y todos los pasos de limpieza necesarios sobre cada tabla, antes de cargarlas al modelo de datos.\n\nEscribí todo en español y nombrá los menús de Excel en español.",
           ejercicio: [
             "Pegar las dos tablas que generó la IA en un libro nuevo (una en cada hoja) y guardarlo como Origen de datos.xlsx. Si al pegar cae todo en la columna A, usá Datos → Texto en columnas y elegí Tabulación como separador.",
             "Desde el libro del curso: Datos → Obtener datos → Desde un archivo → Desde un libro, seleccionar las dos tablas y presionar Transformar datos.",
-            "En Power Query, corregir el tipo de dato de cada columna y aplicar los pasos de limpieza que indicó la IA.",
+            "En Power Query, abrir el Editor avanzado de cada consulta (Inicio → Editor avanzado), pegar el código M que generó la IA y aplicar los cambios.",
             "Cerrar y cargar en → Solo crear conexión, tildando Agregar estos datos al modelo de datos."
           ]
         },
