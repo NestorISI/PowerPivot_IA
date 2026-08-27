@@ -1,0 +1,1065 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<title>Power Pivot + IA</title>
+<style>
+  :root{
+    --ink: #1C231F;
+    --ink-soft: #4B564E;
+    --ink-faint: #7C8880;
+    --paper: #F3EFE4;
+    --surface: #FCFAF3;
+    --surface-2: #ECE6D6;
+    --line: rgba(28,35,31,0.14);
+    --line-strong: rgba(28,35,31,0.28);
+    --green: #1E6F4E;
+    --green-ink: #123C2A;
+    --green-soft: #E1EEE3;
+    --amber: #A9701F;
+    --amber-ink: #5C3D11;
+    --amber-soft: #F5E9D3;
+    --shadow: 0 1px 2px rgba(28,35,31,0.06), 0 8px 24px rgba(28,35,31,0.06);
+    --radius: 10px;
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-body: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink: #EAE6D9;
+      --ink-soft: #B7BEB4;
+      --ink-faint: #808B82;
+      --paper: #12160F;
+      --surface: #191E15;
+      --surface-2: #222819;
+      --line: rgba(234,230,217,0.12);
+      --line-strong: rgba(234,230,217,0.24);
+      --green: #57C293;
+      --green-ink: #BEEBD4;
+      --green-soft: rgba(87,194,147,0.14);
+      --amber: #E3A857;
+      --amber-ink: #F5D8A4;
+      --amber-soft: rgba(227,168,87,0.14);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink: #EAE6D9;
+    --ink-soft: #B7BEB4;
+    --ink-faint: #808B82;
+    --paper: #12160F;
+    --surface: #191E15;
+    --surface-2: #222819;
+    --line: rgba(234,230,217,0.12);
+    --line-strong: rgba(234,230,217,0.24);
+    --green: #57C293;
+    --green-ink: #BEEBD4;
+    --green-soft: rgba(87,194,147,0.14);
+    --amber: #E3A857;
+    --amber-ink: #F5D8A4;
+    --amber-soft: rgba(227,168,87,0.14);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  a{ color: inherit; }
+  button{ font-family: inherit; }
+  ::selection{ background: var(--green-soft); }
+
+  .app{
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    padding: 28px 22px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand{
+    display:flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .brand .kicker{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .brand h1{
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .progress-wrap{
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .progress-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .progress-label strong{
+    font-family: var(--font-mono);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .progress-track{
+    height: 6px; border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .progress-fill{
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--amber));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  nav.toc{
+    display:flex; flex-direction:column; gap: 4px;
+    overflow-y: auto;
+  }
+  .modulo-item{ border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 4px; }
+  .modulo-item:last-child{ border-bottom:none; }
+  .modulo-btn{
+    width:100%;
+    display:flex; align-items:center; gap:10px;
+    background:none; border:none; cursor:pointer;
+    padding: 9px 6px;
+    border-radius: 8px;
+    text-align:left;
+    color: var(--ink);
+  }
+  .modulo-btn:hover{ background: var(--surface-2); }
+  .modulo-num{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    min-width: 18px;
+  }
+  .modulo-title{ font-weight: 600; font-size: 14.5px; flex:1; }
+  .modulo-caret{
+    font-size: 11px; color: var(--ink-faint);
+    transition: transform 0.2s ease;
+  }
+  .modulo-item.open .modulo-caret{ transform: rotate(90deg); }
+
+  .hoja-list{
+    list-style:none; margin: 2px 0 6px; padding: 0 0 0 28px;
+    display:none;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .modulo-item.open .hoja-list{ display:flex; }
+  .hoja-list li a{
+    display:flex; align-items:center; gap:8px;
+    text-decoration:none;
+    padding: 6px 8px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .hoja-list li a:hover{ background: var(--surface-2); color: var(--ink); }
+  .hoja-list li a.active{
+    background: var(--green-soft);
+    color: var(--green-ink);
+    font-weight: 600;
+  }
+  .check-dot{
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    flex: none;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 10px; color: transparent;
+  }
+  .check-dot.done{
+    background: var(--green); border-color: var(--green); color: var(--surface);
+  }
+
+  .sidebar-foot{
+    margin-top: auto;
+    display:flex; flex-direction:column; gap: 10px;
+    font-size: 12px; color: var(--ink-faint);
+  }
+  .theme-toggle{
+    display:flex; gap:6px;
+  }
+  .theme-toggle button{
+    flex:1;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 7px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .theme-toggle button.active{
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+  .reset-btn{
+    background:none; border:1px solid var(--line); color: var(--ink-faint);
+    border-radius:7px; padding:6px 8px; cursor:pointer; font-size:12px;
+  }
+  .reset-btn:hover{ border-color:var(--line-strong); color:var(--ink-soft); }
+
+  /* ---------- Main ---------- */
+  main{
+    padding: 48px 56px 80px;
+    max-width: 760px;
+  }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .crumb{
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .crumb .sep{ margin: 0 6px; }
+  .crumb strong{ color: var(--green); }
+
+  .hoja-title{
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .hoja-sub{
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0 0 34px;
+    max-width: 62ch;
+  }
+
+  section.block{ margin-bottom: 30px; }
+  .block-label{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .block-label .dot{ width:6px; height:6px; border-radius:50%; background: currentColor; }
+
+  .concepto p{ margin: 0 0 12px; max-width: 66ch; color: var(--ink); }
+  .concepto p:last-child{ margin-bottom:0; }
+
+  .callout{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .callout.ia{
+    border-color: color-mix(in srgb, var(--amber) 35%, var(--line));
+    background: var(--amber-soft);
+  }
+  .callout.ia .block-label{ color: var(--amber-ink); }
+  .callout .prompt-text{
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    white-space: pre-wrap;
+    margin: 0 0 12px;
+  }
+  .copy-btn{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .copy-btn:hover{ color: var(--ink); border-color: var(--ink-faint); }
+  .copy-btn.copied{ color: var(--green); border-color: var(--green); }
+
+  .ejercicio{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px 8px;
+    background: var(--green-soft);
+    border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+  }
+  .ejercicio .block-label{ color: var(--green-ink); }
+  .ejercicio ul{ list-style:none; margin:0; padding:0; }
+  .ejercicio li{
+    display:flex; gap:10px; align-items:flex-start;
+    padding: 8px 0 10px;
+    border-bottom: 1px dashed var(--line);
+    font-size: 14.5px;
+  }
+  .ejercicio li:last-child{ border-bottom:none; }
+  .ejercicio input[type="checkbox"]{
+    margin-top: 3px;
+    width: 16px; height: 16px;
+    accent-color: var(--green);
+    flex: none;
+  }
+  .ejercicio label.done-text{ text-decoration: line-through; color: var(--ink-faint); }
+
+  .mark-done{
+    margin-top: 22px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .mark-done button{
+    background: var(--green);
+    color: var(--surface);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .mark-done button.is-done{ background: var(--ink-faint); }
+  .mark-done .hint{ font-size: 12.5px; color: var(--ink-faint); }
+
+  .pager{
+    display:flex; justify-content:space-between;
+    margin-top: 46px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    gap: 16px;
+  }
+  .pager a{
+    text-decoration:none;
+    display:flex; flex-direction:column; gap:3px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    max-width: 46%;
+  }
+  .pager a:hover{ background: var(--surface-2); }
+  .pager a.next{ text-align:right; margin-left:auto; }
+  .pager .pager-kicker{ font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+  .pager .pager-title{ font-weight:600; font-size: 14px; }
+
+  /* ---------- Portada ---------- */
+  .portada .kicker{
+    font-family: var(--font-mono);
+    font-size: 12px; letter-spacing:0.12em; text-transform:uppercase;
+    color: var(--green);
+  }
+  .portada h1{
+    font-family: var(--font-display);
+    font-size: 46px;
+    line-height: 1.08;
+    font-weight: 600;
+    margin: 10px 0 18px;
+    text-wrap: balance;
+  }
+  .portada .lead{
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    margin: 0 0 30px;
+  }
+  .info-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 36px;
+  }
+  .info-card{
+    border:1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px; background: var(--surface);
+  }
+  .info-card .label{ font-family: var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color: var(--ink-faint); margin-bottom:6px;}
+  .info-card .value{ font-size: 14.5px; }
+
+  .modulo-cards{ display:flex; flex-direction:column; gap: 10px; }
+  .modulo-card{
+    display:flex; gap: 16px; align-items:flex-start;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px;
+    background: var(--surface);
+    text-decoration:none; color: var(--ink);
+    cursor:pointer;
+  }
+  .modulo-card:hover{ border-color: var(--line-strong); box-shadow: var(--shadow); }
+  .modulo-card .num{
+    font-family: var(--font-display);
+    font-size: 26px; font-weight:600; color: var(--green);
+    min-width: 34px;
+  }
+  .modulo-card .body h3{ margin:0 0 4px; font-size:16px; }
+  .modulo-card .body p{ margin:0; font-size:13.5px; color: var(--ink-soft); }
+  .modulo-card .count{ margin-left:auto; font-family: var(--font-mono); font-size:12px; color: var(--ink-faint); white-space:nowrap; }
+
+  @media (max-width: 860px){
+    .app{ grid-template-columns: 1fr; }
+    .sidebar{ position: relative; height:auto; }
+    main{ padding: 32px 20px 60px; }
+    .info-grid{ grid-template-columns: 1fr; }
+    .portada h1{ font-size: 34px; }
+  }
+</style>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="kicker">Guía del curso</span>
+      <h1>Power Pivot + IA</h1>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Progreso</span>
+        <strong id="progress-count">0/20</strong>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <nav class="toc" id="toc"></nav>
+
+    <div class="sidebar-foot">
+      <div class="theme-toggle">
+        <button data-theme-choice="light" id="btn-light">Claro</button>
+        <button data-theme-choice="dark" id="btn-dark">Oscuro</button>
+        <button data-theme-choice="system" id="btn-system">Auto</button>
+      </div>
+      <button class="reset-btn" id="reset-progress">Reiniciar progreso</button>
+    </div>
+  </aside>
+
+  <main>
+    <section class="view portada active" id="view-portada"></section>
+    <section class="view" id="view-hoja">
+      <div class="crumb" id="hoja-crumb"></div>
+      <h2 class="hoja-title" id="hoja-title"></h2>
+      <p class="hoja-sub" id="hoja-sub"></p>
+
+      <section class="block concepto">
+        <p class="block-label"><span class="dot"></span>Concepto</p>
+        <div id="hoja-concepto"></div>
+      </section>
+
+      <section class="block">
+        <div class="callout ia">
+          <p class="block-label"><span class="dot"></span>Prompt para la IA</p>
+          <p class="prompt-text" id="hoja-prompt"></p>
+          <button class="copy-btn" id="copy-prompt">Copiar prompt</button>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="ejercicio">
+          <p class="block-label"><span class="dot"></span>Ejercicio práctico</p>
+          <ul id="hoja-ejercicio"></ul>
+        </div>
+      </section>
+
+      <div class="mark-done">
+        <button id="btn-mark-done">Marcar hoja como completada</button>
+        <span class="hint" id="mark-hint"></span>
+      </div>
+
+      <div class="pager" id="pager"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DATA = [
+    {
+      id: "m1", title: "Preparar los datos",
+      blurb: "Importar, limpiar y relacionar las tablas antes de formular nada.",
+      hojas: [
+        {
+          id: "h1", title: "Importar y limpiar datos con Power Query",
+          sub: "El punto de partida de todo el modelo: nada entra a Power Pivot sin pasar antes por acá.",
+          concepto: [
+            "Power Pivot no carga información directamente: primero hay que traerla y prepararla con Power Query, desde el menú Datos → Obtener datos.",
+            "Ahí se define el tipo de cada columna (texto, fecha, número, moneda) antes de mandarla al modelo de datos — corregir esto al principio evita errores más adelante en las fórmulas DAX."
+          ],
+          prompt: "Tengo estas columnas en mi tabla de ventas: [pegá los encabezados]. Decime qué tipo de dato le corresponde a cada una en Power Query y qué pasos de limpieza (renombrar, quitar duplicados, corregir tipos) me conviene aplicar antes de cargarla al modelo de datos.",
+          ejercicio: [
+            "Importar al menos dos tablas (por ejemplo Ventas y Clientes) con Obtener datos → Desde un libro.",
+            "Revisar y corregir el tipo de dato de cada columna en Power Query.",
+            "Cargar ambas tablas al modelo de datos (sin crear conexión de hoja)."
+          ]
+        },
+        {
+          id: "h2", title: "Relacionar las tablas (modelo de datos)",
+          sub: "Sin relaciones, Power Pivot no puede cruzar la información entre tablas.",
+          concepto: [
+            "Una relación conecta una tabla de hechos (por ejemplo Ventas) con tablas de dimensiones (Clientes, Productos, Vendedores) a través de un campo en común.",
+            "Esto se define en la Vista de diagrama de Power Pivot, arrastrando de la clave de una tabla a la otra."
+          ],
+          prompt: "Tengo una tabla de HECHOS llamada Ventas con las columnas [...] y tablas de DIMENSIONES: Clientes, Productos, Vendedores con columnas [...]. ¿Qué relaciones debería crear y por qué campo? Explicame la diferencia entre tabla de hechos y de dimensiones con este ejemplo.",
+          ejercicio: [
+            "Abrir la Vista de diagrama en Power Pivot (Inicio → Vista de diagrama).",
+            "Conectar cada tabla de dimensión con la tabla de hechos por su campo clave.",
+            "Verificar con una tabla dinámica simple que los datos ya se cruzan correctamente."
+          ]
+        },
+        {
+          id: "h3", title: "Tabla de calendario dinámica",
+          sub: "La base indispensable para cualquier análisis por año, mes o trimestre.",
+          concepto: [
+            "Para analizar por período se necesita una tabla de calendario separada, relacionada con las ventas por la columna de fecha.",
+            "Power Pivot puede generarla automáticamente (Diseño → Tabla de fechas → Nueva) y ajustar el rango al mínimo y máximo real de los datos."
+          ],
+          prompt: "Necesito armar una tabla de calendario en Power Pivot para un análisis que va desde [fecha mínima] hasta [fecha máxima]. Decime los pasos para generarla y qué columnas calculadas (año, mes, trimestre, nombre del mes) me conviene agregar para poder segmentar después.",
+          ejercicio: [
+            "Insertar Tabla de fechas → Nueva desde el menú Diseño.",
+            "Actualizar el rango de fechas al mínimo y máximo real de tus ventas.",
+            "Relacionar la tabla de calendario con la tabla de ventas por el campo de fecha."
+          ]
+        }
+      ]
+    },
+    {
+      id: "m2", title: "Fundamentos de DAX con IA",
+      blurb: "Columnas y medidas básicas, generadas y explicadas con ayuda de la IA.",
+      hojas: [
+        {
+          id: "h1", title: "Columnas calculadas (fechas y texto)",
+          sub: "Un nuevo dato por cada fila: la puerta de entrada a DAX.",
+          concepto: [
+            "Las columnas calculadas agregan un dato nuevo a cada fila de una tabla — ideales para descomponer fechas (año, mes, día de semana) o transformar texto (mayúsculas, iniciales).",
+            "Se crean en Power Pivot, dentro de la tabla correspondiente, con el botón Agregar columna."
+          ],
+          prompt: "Escribime la fórmula DAX para una columna calculada que extraiga [el mes en texto / el día de la semana en español / la primera letra del apellido] de la columna [Fecha o Apellido] en la tabla [Calendar o Clientes], y explicame qué hace cada parte de la fórmula.",
+          ejercicio: [
+            "Crear en la tabla Calendar columnas de Año, Mes (en texto) y Trimestre.",
+            "Crear en Clientes una columna que una nombre y apellido.",
+            "Si una fórmula da error, pedirle a la IA que la revise antes de reescribirla de cero."
+          ]
+        },
+        {
+          id: "h2", title: "Medidas básicas (SUM, AVERAGE, COUNTROWS, DISTINCTCOUNT)",
+          sub: "Cálculos que se recalculan solos según el filtro activo.",
+          concepto: [
+            "A diferencia de las columnas, las medidas se recalculan según el contexto de filtro (año, vendedor, etc.) en el que se usan.",
+            "Conviene guardarlas todas en una tabla propia, sin datos, llamada Medidas — así quedan ordenadas y fáciles de encontrar."
+          ],
+          prompt: "Quiero crear una tabla de Medidas en Power Pivot. Necesito medidas de: total de ingresos (SUM), ingreso promedio (AVERAGE), cantidad de transacciones (COUNTROWS) y cantidad de clientes distintos (DISTINCTCOUNT). Escribime las cuatro fórmulas DAX y decime en qué tabla y columna debería basarlas.",
+          ejercicio: [
+            "Crear la tabla Medidas dentro del modelo de datos.",
+            "Cargar las cuatro fórmulas que te dio la IA.",
+            "Verlas juntas en una tabla dinámica con un segmentador de año."
+          ]
+        },
+        {
+          id: "h3", title: "RELATED, SUMX y AVERAGEX (margen y rentabilidad)",
+          sub: "Cálculos fila por fila entre tablas relacionadas.",
+          concepto: [
+            "RELATED trae un dato de otra tabla relacionada (por ejemplo el costo de un producto desde Ventas).",
+            "SUMX y AVERAGEX recorren la tabla fila por fila para calcular cosas que no son una simple suma directa, como el margen o la rentabilidad."
+          ],
+          prompt: "Tengo Ventas con Cantidad y Precio, y una tabla Productos con Costo relacionada por ID Producto. Ayudame a escribir medidas DAX para: ingreso total, costo total (usando RELATED y SUMX), margen (ingreso menos costo) y rentabilidad (margen sobre ingreso, en porcentaje). Explicame por qué se necesita SUMX y no un SUM simple.",
+          ejercicio: [
+            "Agregar las cuatro medidas (ingreso, costo, margen, rentabilidad) a la tabla Medidas.",
+            "Verificar el resultado en una tabla dinámica por producto o por vendedor."
+          ]
+        },
+        {
+          id: "h4", title: "Funciones lógicas (IF, SWITCH, DATEDIFF)",
+          sub: "Categorías y diferencias de fecha, listas para usar como segmentadores.",
+          concepto: [
+            "IF y SWITCH permiten crear categorías (con o sin hijos, rangos de edad); SWITCH es más prolijo que anidar varios IF cuando hay más de dos resultados posibles.",
+            "DATEDIFF calcula la diferencia entre dos fechas en la unidad que elijas — típicamente para calcular edad o antigüedad."
+          ],
+          prompt: "Necesito una columna calculada en la tabla Clientes que clasifique la edad en tres rangos (menos de 30, 30 a 60, más de 60) usando SWITCH, y otra que calcule la edad exacta a partir de la fecha de nacimiento con DATEDIFF. Escribime ambas fórmulas y explicame la diferencia entre usar IF anidado y SWITCH.",
+          ejercicio: [
+            "Crear la columna de rango de edad con SWITCH.",
+            "Crear la columna de edad calculada con DATEDIFF.",
+            "Usar ambas como segmentadores en una tabla dinámica de prueba."
+          ]
+        }
+      ]
+    },
+    {
+      id: "m3", title: "Inteligencia de tiempo y filtros avanzados",
+      blurb: "CALCULATE y sus modificadores: el corazón de cualquier análisis comparativo.",
+      hojas: [
+        {
+          id: "h1", title: "CALCULATE: el modificador de filtros",
+          sub: "La función más importante de DAX.",
+          concepto: [
+            "CALCULATE permite cambiar el contexto de filtro de una medida — por ejemplo, calcular ingresos 'solo de clientas mujeres' o 'solo del 2020' sin tocar la tabla dinámica.",
+            "Es la base de casi todas las funciones de inteligencia de tiempo que vienen a continuación."
+          ],
+          prompt: "Explicame con un ejemplo simple cómo funciona CALCULATE en DAX. Después ayudame a escribir una medida que calcule los ingresos solo de clientas mujeres, usando CALCULATE sobre mi medida de Ingresos.",
+          ejercicio: [
+            "Crear una medida de ingresos filtrada por género usando CALCULATE.",
+            "Compararla en una tabla dinámica contra el total general."
+          ]
+        },
+        {
+          id: "h2", title: "Inteligencia de tiempo (DATESYTD, DATESMTD, DATESQTD, DATEADD)",
+          sub: "La base de cualquier comparación contra un período anterior.",
+          concepto: [
+            "DATESYTD, DATESMTD y DATESQTD acumulan valores desde el inicio del año, mes o trimestre hasta la fecha indicada.",
+            "DATEADD desplaza el cálculo a un período anterior (o posterior) — la pieza clave para comparar 'este año vs. el año pasado'."
+          ],
+          prompt: "Quiero crear medidas de inteligencia de tiempo sobre mi medida Ingresos: acumulado del año (DATESYTD), acumulado del mes (DATESMTD), acumulado del trimestre (DATESQTD) y el valor del mismo período del año anterior (DATEADD). Escribime las cuatro fórmulas y decime qué necesito tener listo en mi tabla de calendario para que funcionen.",
+          ejercicio: [
+            "Crear las cuatro medidas de inteligencia de tiempo.",
+            "Probarlas en una tabla dinámica con segmentador de año y mes."
+          ]
+        },
+        {
+          id: "h3", title: "Variaciones entre períodos (% vs. año anterior)",
+          sub: "De dos medidas a un porcentaje de crecimiento o caída.",
+          concepto: [
+            "Con la medida del período actual y la del período anterior ya armadas, calcular la variación porcentual es el paso natural para mostrar crecimiento o caída.",
+            "Se puede calcular a nivel anual, trimestral o mensual, acumulado o granular."
+          ],
+          prompt: "Tengo las medidas Ingresos e Ingresos Año Anterior. Ayudame a escribir la medida de Variación Anual en porcentaje, y una versión acumulada. Decime también cómo formatearla como porcentaje con signo.",
+          ejercicio: [
+            "Crear la medida de variación anual y su versión acumulada.",
+            "Agregarlas a una tabla dinámica con formato porcentual."
+          ]
+        },
+        {
+          id: "h4", title: "ALL, ALLEXCEPT y ALLSELECTED",
+          sub: "Tres formas distintas de 'ignorar' filtros — y cuándo usar cada una.",
+          concepto: [
+            "ALL ignora todos los filtros de una tabla; ALLEXCEPT ignora todos menos los que vos indiques; ALLSELECTED respeta los filtros externos pero ignora los internos de la visual.",
+            "Elegir mal entre los tres es la causa más común de que una medida de 'participación sobre el total' dé un resultado inesperado."
+          ],
+          prompt: "Explicame la diferencia entre ALL, ALLEXCEPT y ALLSELECTED en DAX con un ejemplo de ventas por vendedor y por mes. Después ayudame a escribir una medida de 'participación sobre el total' usando el modificador correcto.",
+          ejercicio: [
+            "Crear una medida de ventas históricas totales con ALL.",
+            "Crear una medida de participación por vendedor.",
+            "Probar ambas con segmentadores de año y mes para ver cómo reacciona cada una."
+          ]
+        },
+        {
+          id: "h5", title: "FILTER, AND/OR/IN y HASONEVALUE",
+          sub: "Combinar criterios y armar títulos que reaccionan al segmentador.",
+          concepto: [
+            "FILTER permite combinar varios criterios lógicos (por ejemplo género y estado civil) dentro de un CALCULATE.",
+            "HASONEVALUE sirve para saber si un segmentador tiene un solo valor seleccionado — la base de cualquier título dinámico bien hecho."
+          ],
+          prompt: "Ayudame a escribir una medida que cuente los clientes hombres solteros combinando FILTER con dos condiciones (usando &&), y otra medida que use HASONEVALUE para mostrar el nombre del cliente solo cuando hay uno seleccionado en el segmentador, o un mensaje si hay varios.",
+          ejercicio: [
+            "Crear la medida combinada con FILTER y dos condiciones.",
+            "Crear el título dinámico con HASONEVALUE e IF.",
+            "Probar seleccionando uno y luego varios clientes en el segmentador."
+          ]
+        }
+      ]
+    },
+    {
+      id: "m4", title: "Reportes y dashboards interactivos",
+      blurb: "De las medidas sueltas a un reporte conectado por segmentadores.",
+      hojas: [
+        {
+          id: "h1", title: "Reporte por vendedor",
+          sub: "El primer reporte completo: varias tablas dinámicas conectadas.",
+          concepto: [
+            "El primer reporte combina tablas dinámicas de ingresos por año, por mes, top de marcas y top de clientes, conectadas entre sí por segmentadores.",
+            "El formato condicional se usa acá para resaltar rentabilidad baja sin tener que leer cada celda."
+          ],
+          prompt: "Quiero armar un reporte de ventas por vendedor con: ingresos por año, ingresos por mes, top 10 marcas y top 10 clientes. ¿Qué tablas dinámicas necesito, qué segmentadores debería usar para que se conecten todas, y qué formato condicional recomendás para resaltar rentabilidad baja?",
+          ejercicio: [
+            "Armar las cuatro tablas dinámicas (año, mes, top marcas, top clientes).",
+            "Vincularlas todas por segmentador de vendedor, mes y año (conexión de informes).",
+            "Aplicar formato condicional a la columna de rentabilidad."
+          ]
+        },
+        {
+          id: "h2", title: "Reporte por cliente (detalle y segmentadores por letra)",
+          sub: "Cuando hay cientos de registros, la navegación importa tanto como el dato.",
+          concepto: [
+            "Con muchos clientes conviene agregar segmentadores por inicial de nombre y apellido, para encontrar uno específico sin scrollear una lista larga.",
+            "Un título dinámico (con HASONEVALUE) muestra el nombre del cliente seleccionado, o avisa si hay más de uno."
+          ],
+          prompt: "Tengo 350 clientes y quiero un reporte de detalle individual por cliente. ¿Cómo armo segmentadores por primera letra de nombre y apellido para que sea más fácil de buscar, y cómo genero un título que diga el nombre del cliente seleccionado (o un aviso si hay más de uno)?",
+          ejercicio: [
+            "Crear columnas de primera letra de nombre y apellido.",
+            "Insertar los segmentadores y vincularlos al reporte de detalle.",
+            "Armar el título dinámico del cliente seleccionado."
+          ]
+        },
+        {
+          id: "h3", title: "Reporte por marca",
+          sub: "El mismo patrón que el reporte de cliente, a nivel marca.",
+          concepto: [
+            "Histórico de ingresos, ingresos por país y por vendedor a nivel marca, siguiendo la misma lógica de segmentadores conectados que en el reporte de cliente.",
+            "Reaprovechar la estructura ya armada ahorra la mayor parte del trabajo manual."
+          ],
+          prompt: "Quiero replicar la lógica del reporte de cliente pero para marcas: histórico de ingresos, ingresos por país y por vendedor. Decime qué tablas dinámicas armar y cómo evitar tener que repetir todo el trabajo manual — ¿qué puedo reutilizar del reporte anterior?",
+          ejercicio: [
+            "Armar las tablas dinámicas de marca (histórico, por país, por vendedor).",
+            "Vincularlas con el segmentador de marca.",
+            "Agregar los gráficos correspondientes."
+          ]
+        },
+        {
+          id: "h4", title: "Reporte por sucursal / geografía",
+          sub: "Una capa geográfica más, con tops automáticos.",
+          concepto: [
+            "Un reporte geográfico agrega niveles de continente, país y sucursal, generalmente con gráficos comparativos y un top 10 automático de clientes y marcas.",
+            "El filtro de valor '10 mejores' de la tabla dinámica resuelve esto sin fórmulas adicionales."
+          ],
+          prompt: "Necesito un reporte de ventas por sucursal con niveles de continente, país y vendedor, más un top 10 de clientes y de marcas. ¿Qué filtros de valor (top N) uso en la tabla dinámica y cómo los conecto con el resto del reporte?",
+          ejercicio: [
+            "Armar las tablas dinámicas por continente, país y vendedor.",
+            "Aplicar el filtro de valor '10 mejores' a clientes y marcas.",
+            "Conectar todo con los segmentadores ya existentes."
+          ]
+        },
+        {
+          id: "h5", title: "Formato condicional y gráficos que comunican",
+          sub: "El objetivo no es decorar: es que lo importante salte a la vista.",
+          concepto: [
+            "El formato condicional (barras, iconos, colores) existe para que un número negativo o una caída se note sin leer cada celda, no para decorar la planilla.",
+            "El tipo de gráfico también comunica: columnas para comparar años, líneas para mostrar evolución mensual."
+          ],
+          prompt: "Tengo columnas de variación porcentual (algunas negativas) en mi reporte. ¿Qué tipo de formato condicional (barra de datos, conjunto de iconos, resaltado) recomendás para cada caso, y qué tipo de gráfico conviene para comparar años vs. mostrar evolución mensual?",
+          ejercicio: [
+            "Aplicar formato condicional a las columnas de variación.",
+            "Insertar un gráfico de columnas y líneas combinado para año y mes.",
+            "Quitar leyendas y botones de campo innecesarios del gráfico."
+          ]
+        }
+      ]
+    },
+    {
+      id: "m5", title: "Portada y automatización final",
+      blurb: "De un conjunto de reportes a un dashboard que se siente terminado.",
+      hojas: [
+        {
+          id: "h1", title: "Portada y navegación con botones",
+          sub: "La primera impresión del dashboard.",
+          concepto: [
+            "Una portada con título dinámico y botones que navegan a cada hoja hace que el archivo se sienta como un dashboard real, no como una planilla suelta.",
+            "El título dinámico se arma vinculando una celda a una medida que devuelve el período de los datos."
+          ],
+          prompt: "Quiero armar una portada para mi dashboard de Excel con título dinámico (que muestre el período de los datos) y botones que naveguen a las hojas de Vendedores, Clientes, Marcas y Sucursales. Decime cómo armar el título dinámico con una medida y cómo vincular botones a cada hoja.",
+          ejercicio: [
+            "Crear la hoja Portada.",
+            "Insertar el título vinculado a una medida.",
+            "Insertar y formatear los botones de navegación."
+          ]
+        },
+        {
+          id: "h2", title: "Macros básicas (actualizar y limpiar filtros)",
+          sub: "Automatizar sin necesidad de programar VBA desde cero.",
+          concepto: [
+            "Una macro grabada puede actualizar automáticamente todas las tablas dinámicas al abrir el archivo, o limpiar los segmentadores con un clic.",
+            "La macro Auto_Open tiene un nombre especial: Excel la ejecuta sola al abrir el libro."
+          ],
+          prompt: "Nunca escribí una macro. Quiero que al abrir mi archivo de Excel se actualicen automáticamente todas las tablas dinámicas y vuelva a la hoja Portada. Explicame paso a paso cómo grabar esa macro con el nombre Auto_Open, y qué significa ese nombre especial.",
+          ejercicio: [
+            "Grabar la macro Auto_Open (ir a Portada + actualizar todo).",
+            "Grabar una segunda macro que limpie los filtros de los segmentadores.",
+            "Asignar esta última macro a un botón."
+          ]
+        },
+        {
+          id: "h3", title: "Empaquetado final del dashboard",
+          sub: "El checklist antes de compartirlo.",
+          concepto: [
+            "Antes de compartir el dashboard conviene ocultar la pestaña de hojas, guardar como .xlsm (para que las macros funcionen) y confirmar que todo arranca desde la portada.",
+            "Es el mismo tipo de revisión final que harías con cualquier entregable: que la primera impresión sea la correcta."
+          ],
+          prompt: "Antes de entregar mi dashboard, ¿qué checklist final me recomendás? Pienso ocultar la barra de hojas y guardar en formato con macros. ¿Qué más debería revisar (nombres de tablas, referencias rotas, tamaño del archivo) antes de compartirlo?",
+          ejercicio: [
+            "Ocultar la pestaña de hojas (Archivo → Opciones → Avanzadas).",
+            "Guardar el archivo como .xlsm.",
+            "Cerrar y volver a abrir el archivo para confirmar que arranca en la Portada con los datos actualizados."
+          ]
+        }
+      ]
+    }
+  ];
+
+  var FLAT = [];
+  DATA.forEach(function(m, mi){
+    m.num = mi + 1;
+    m.hojas.forEach(function(h, hi){
+      h.num = hi + 1;
+      h.moduloId = m.id;
+      h.moduloTitle = m.title;
+      h.code = "M" + m.num + "." + "H" + h.num;
+      h.key = m.id + "-" + h.id;
+      FLAT.push(h);
+    });
+  });
+  var TOTAL = FLAT.length;
+
+  var STORAGE_KEY = "ppia-progreso";
+  var THEME_KEY = "ppia-theme";
+
+  function loadProgress(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveProgress(p){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){}
+  }
+  var progress = loadProgress();
+
+  function isDone(key){ return !!progress[key]; }
+  function setDone(key, val){
+    if(val){ progress[key] = true; } else { delete progress[key]; }
+    saveProgress(progress);
+    renderToc();
+    renderProgressBar();
+  }
+
+  function countDone(){
+    var n = 0;
+    FLAT.forEach(function(h){ if(isDone(h.key)) n++; });
+    return n;
+  }
+
+  function renderProgressBar(){
+    var n = countDone();
+    document.getElementById("progress-count").textContent = n + "/" + TOTAL;
+    document.getElementById("progress-fill").style.width = (TOTAL ? (n / TOTAL * 100) : 0) + "%";
+  }
+
+  var toc = document.getElementById("toc");
+  function renderToc(){
+    var currentKey = getCurrentKey();
+    toc.innerHTML = "";
+    DATA.forEach(function(m){
+      var item = document.createElement("div");
+      item.className = "modulo-item";
+      var hasActive = m.hojas.some(function(h){ return (m.id + "-" + h.id) === currentKey; });
+      if(hasActive) item.classList.add("open");
+
+      var btn = document.createElement("button");
+      btn.className = "modulo-btn";
+      btn.innerHTML = '<span class="modulo-num">' + m.num + '</span><span class="modulo-title">' + m.title + '</span><span class="modulo-caret">&#9656;</span>';
+      btn.addEventListener("click", function(){ item.classList.toggle("open"); });
+      item.appendChild(btn);
+
+      var ul = document.createElement("ul");
+      ul.className = "hoja-list";
+      m.hojas.forEach(function(h){
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        var key = m.id + "-" + h.id;
+        a.href = "#" + key;
+        a.textContent = "";
+        var dot = document.createElement("span");
+        dot.className = "check-dot" + (isDone(key) ? " done" : "");
+        dot.innerHTML = isDone(key) ? "&#10003;" : "";
+        a.appendChild(dot);
+        var span = document.createElement("span");
+        span.textContent = h.title;
+        a.appendChild(span);
+        if(key === currentKey) a.classList.add("active");
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      item.appendChild(ul);
+      toc.appendChild(item);
+    });
+  }
+
+  function getCurrentKey(){
+    var hash = window.location.hash.replace("#", "");
+    return hash;
+  }
+
+  function findHoja(key){
+    for(var i=0;i<FLAT.length;i++){ if(FLAT[i].key === key) return FLAT[i]; }
+    return null;
+  }
+
+  var viewPortada = document.getElementById("view-portada");
+  var viewHoja = document.getElementById("view-hoja");
+
+  function renderPortada(){
+    var html = '';
+    html += '<div class="portada">';
+    html += '<span class="kicker">Guía interactiva &middot; sin código, con IA</span>';
+    html += '<h1>Power Pivot + Inteligencia Artificial</h1>';
+    html += '<p class="lead">Esta guía acompaña las clases en vivo del profesor. Cada hoja tiene un concepto breve, un prompt listo para pegarle a tu IA de confianza (Copilot, ChatGPT, Claude) y un ejercicio para practicar en tu propio Excel — el mismo resultado que un curso tradicional de Power Pivot, en menos pasos.</p>';
+
+    html += '<div class="info-grid">';
+    html += '<div class="info-card"><div class="label">Cómo usarla</div><div class="value">Seguí el orden de los módulos. Marcá cada hoja como completada para llevar el registro de tu avance.</div></div>';
+    html += '<div class="info-card"><div class="label">El rol de la IA</div><div class="value">No reemplaza la clase: te ayuda a escribir y entender cada fórmula DAX o paso de Power Query más rápido.</div></div>';
+    html += '</div>';
+
+    html += '<div class="modulo-cards">';
+    DATA.forEach(function(m){
+      html += '<div class="modulo-card" data-goto="' + (m.id + "-" + m.hojas[0].id) + '">';
+      html += '<div class="num">' + String(m.num).padStart(2,"0") + '</div>';
+      html += '<div class="body"><h3>' + m.title + '</h3><p>' + m.blurb + '</p></div>';
+      html += '<div class="count">' + m.hojas.length + ' hojas</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    viewPortada.innerHTML = html;
+
+    viewPortada.querySelectorAll(".modulo-card").forEach(function(card){
+      card.addEventListener("click", function(){
+        window.location.hash = card.getAttribute("data-goto");
+      });
+    });
+  }
+
+  function esc(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function renderHoja(h){
+    document.getElementById("hoja-crumb").innerHTML =
+      '<strong>' + h.code + '</strong><span class="sep">&middot;</span>' + esc(h.moduloTitle);
+    document.getElementById("hoja-title").textContent = h.title;
+    document.getElementById("hoja-sub").textContent = h.sub;
+
+    var conceptoEl = document.getElementById("hoja-concepto");
+    conceptoEl.innerHTML = h.concepto.map(function(p){ return "<p>" + esc(p) + "</p>"; }).join("");
+
+    document.getElementById("hoja-prompt").textContent = h.prompt;
+
+    var ejEl = document.getElementById("hoja-ejercicio");
+    var done = isDone(h.key);
+    ejEl.innerHTML = h.ejercicio.map(function(item, idx){
+      var cid = "ej-" + h.key + "-" + idx;
+      return '<li><input type="checkbox" id="' + cid + '" data-idx="' + idx + '"' + (done ? " checked" : "") + '/><label for="' + cid + '">' + esc(item) + '</label></li>';
+    }).join("");
+
+    var markBtn = document.getElementById("btn-mark-done");
+    var markHint = document.getElementById("mark-hint");
+    function refreshMarkBtn(){
+      var d = isDone(h.key);
+      markBtn.textContent = d ? "Hoja completada" : "Marcar hoja como completada";
+      markBtn.classList.toggle("is-done", d);
+      markHint.textContent = d ? "Tu progreso se guarda en este navegador." : "";
+    }
+    refreshMarkBtn();
+    markBtn.onclick = function(){ setDone(h.key, !isDone(h.key)); refreshMarkBtn(); renderHoja(h); };
+
+    var copyBtn = document.getElementById("copy-prompt");
+    copyBtn.classList.remove("copied");
+    copyBtn.textContent = "Copiar prompt";
+    copyBtn.onclick = function(){
+      var text = h.prompt;
+      function done_(){
+        copyBtn.textContent = "Copiado";
+        copyBtn.classList.add("copied");
+        setTimeout(function(){ copyBtn.textContent = "Copiar prompt"; copyBtn.classList.remove("copied"); }, 1600);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done_).catch(function(){
+          fallbackCopy(text); done_();
+        });
+      } else {
+        fallbackCopy(text); done_();
+      }
+    };
+    function fallbackCopy(text){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try{ document.execCommand("copy"); }catch(e){}
+      document.body.removeChild(ta);
+    }
+
+    var idx = FLAT.indexOf(h);
+    var prev = FLAT[idx - 1];
+    var next = FLAT[idx + 1];
+    var pagerHtml = "";
+    if(prev){
+      pagerHtml += '<a class="prev" href="#' + prev.key + '"><span class="pager-kicker">&larr; ' + prev.code + '</span><span class="pager-title">' + esc(prev.title) + '</span></a>';
+    } else {
+      pagerHtml += '<span></span>';
+    }
+    if(next){
+      pagerHtml += '<a class="next" href="#' + next.key + '"><span class="pager-kicker">' + next.code + ' &rarr;</span><span class="pager-title">' + esc(next.title) + '</span></a>';
+    }
+    document.getElementById("pager").innerHTML = pagerHtml;
+  }
+
+  function router(){
+    var key = getCurrentKey();
+    var h = key ? findHoja(key) : null;
+    if(h){
+      viewPortada.classList.remove("active");
+      viewHoja.classList.add("active");
+      renderHoja(h);
+    } else {
+      viewHoja.classList.remove("active");
+      viewPortada.classList.add("active");
+      renderPortada();
+    }
+    renderToc();
+    renderProgressBar();
+    window.scrollTo(0,0);
+  }
+
+  window.addEventListener("hashchange", router);
+
+  document.getElementById("reset-progress").addEventListener("click", function(){
+    progress = {};
+    saveProgress(progress);
+    router();
+  });
+
+  /* theme */
+  function applyTheme(choice){
+    if(choice === "light"){ document.documentElement.setAttribute("data-theme","light"); }
+    else if(choice === "dark"){ document.documentElement.setAttribute("data-theme","dark"); }
+    else { document.documentElement.removeAttribute("data-theme"); }
+    ["light","dark","system"].forEach(function(c){
+      document.getElementById("btn-" + c).classList.toggle("active", c === choice);
+    });
+    try{ localStorage.setItem(THEME_KEY, choice); }catch(e){}
+  }
+  ["light","dark","system"].forEach(function(c){
+    document.getElementById("btn-" + c).addEventListener("click", function(){ applyTheme(c); });
+  });
+  var savedTheme = "system";
+  try{ savedTheme = localStorage.getItem(THEME_KEY) || "system"; }catch(e){}
+  applyTheme(savedTheme);
+
+  router();
+})();
+</script>
