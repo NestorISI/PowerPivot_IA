@@ -1,3 +1,20 @@
+<!--
+  Power Pivot + IA — Guía interactiva
+  Versión actual: 1.1 (27 ago 2026)
+
+  REGISTRO DE VERSIONES
+  ---------------------
+  v1.1 — 27 ago 2026
+    · M1.H1: prompt reescrito para que sea autosuficiente (el alumno lo copia y
+      lo pega sin completar nada). Ahora la IA genera las tablas de práctica.
+    · M1.H1: tercer párrafo en el concepto explicando de dónde salen los datos.
+    · M1.H1: ejercicio de 3 a 4 pasos, alineado al arranque desde libro en blanco.
+    · Se agrega el número de versión visible en la barra lateral.
+
+  v1 — versión base
+    · 5 módulos, 20 hojas. Por hoja: concepto, prompt para la IA y ejercicio.
+    · Progreso guardado en localStorage, tema claro/oscuro/auto.
+-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <title>Power Pivot + IA</title>
 <style>
@@ -230,6 +247,13 @@
     border-radius:7px; padding:6px 8px; cursor:pointer; font-size:12px;
   }
   .reset-btn:hover{ border-color:var(--line-strong); color:var(--ink-soft); }
+  .version{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    text-align: center;
+  }
 
   /* ---------- Main ---------- */
   main{
@@ -454,6 +478,7 @@
         <button data-theme-choice="system" id="btn-system">Auto</button>
       </div>
       <button class="reset-btn" id="reset-progress">Reiniciar progreso</button>
+      <div class="version">v1.1 &middot; 27 ago 2026</div>
     </div>
   </aside>
 
@@ -508,13 +533,15 @@
           sub: "El punto de partida de todo el modelo: nada entra a Power Pivot sin pasar antes por acá.",
           concepto: [
             "Power Pivot no carga información directamente: primero hay que traerla y prepararla con Power Query, desde el menú Datos → Obtener datos.",
-            "Ahí se define el tipo de cada columna (texto, fecha, número, moneda) antes de mandarla al modelo de datos — corregir esto al principio evita errores más adelante en las fórmulas DAX."
+            "Ahí se define el tipo de cada columna (texto, fecha, número, moneda) antes de mandarla al modelo de datos — corregir esto al principio evita errores más adelante en las fórmulas DAX.",
+            "Como arrancamos con un libro en blanco, el archivo de origen lo vas a fabricar vos: el prompt de esta hoja le pide a la IA que genere dos tablas de práctica, ya ensuciadas a propósito, para que tengas algo real que importar y limpiar."
           ],
-          prompt: "Tengo estas columnas en mi tabla de ventas: [pegá los encabezados]. Decime qué tipo de dato le corresponde a cada una en Power Query y qué pasos de limpieza (renombrar, quitar duplicados, corregir tipos) me conviene aplicar antes de cargarla al modelo de datos.",
+          prompt: "Estoy empezando un curso de Power Pivot en Excel y necesito datos de práctica que después voy a importar con Power Query.\n\n1. Generame dos tablas de ejemplo de una empresa que vende productos. VENTAS: 60 filas, con las columnas ID Venta, Fecha, ID Cliente, Producto, Cantidad y Precio Unitario. CLIENTES: 12 filas, con las columnas ID Cliente, Nombre, Apellido, Ciudad y Fecha de Alta. Todos los ID Cliente que aparezcan en Ventas tienen que existir en Clientes, y las fechas tienen que estar entre enero de 2023 y diciembre de 2024.\n\n2. Ensuciá los datos a propósito para que tenga algo que limpiar: fechas escritas como texto y con formatos mezclados, importes con símbolo de moneda, espacios de más y mayúsculas inconsistentes en los nombres, y dos filas repetidas en Ventas.\n\n3. Mostrame cada tabla en un bloque de código, con las columnas separadas por tabulaciones, para poder copiarlas y pegarlas en Excel y que se repartan solas en columnas.\n\n4. Después de las tablas, hacé una lista con el tipo de dato que le corresponde a cada columna en Power Query (texto, fecha, número entero, decimal, moneda) y con los pasos de limpieza que tengo que aplicar, en orden, antes de cargar las tablas al modelo de datos.\n\nEscribí todo en español y nombrá los menús de Excel en español.",
           ejercicio: [
-            "Importar al menos dos tablas (por ejemplo Ventas y Clientes) con Obtener datos → Desde un libro.",
-            "Revisar y corregir el tipo de dato de cada columna en Power Query.",
-            "Cargar ambas tablas al modelo de datos (sin crear conexión de hoja)."
+            "Pegar las dos tablas que generó la IA en un libro nuevo (una en cada hoja) y guardarlo como Origen de datos.xlsx. Si al pegar cae todo en la columna A, usá Datos → Texto en columnas y elegí Tabulación como separador.",
+            "Desde el libro del curso: Datos → Obtener datos → Desde un archivo → Desde un libro, seleccionar las dos tablas y presionar Transformar datos.",
+            "En Power Query, corregir el tipo de dato de cada columna y aplicar los pasos de limpieza que indicó la IA.",
+            "Cerrar y cargar en → Solo crear conexión, tildando Agregar estos datos al modelo de datos."
           ]
         },
         {
